@@ -1,0 +1,89 @@
+
+
+package register_patients;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+   
+
+
+@WebServlet("/register")
+public class registerPatientServlet extends HttpServlet {
+
+	
+	@Override
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+	throws ServletException , IOException{
+		String patientName = request.getParameter("pname");
+		String patientAgeStr = request.getParameter("page");
+		int age = Integer.parseInt(patientAgeStr);
+		String patientGender = request.getParameter("pgender");
+		String patientContact = request.getParameter("pcontact");
+		
+		
+		System.out.println("---------------------------------------------------");
+		
+		
+		//String mysqlString = "com.mysql.cj.jdbc.Driver";
+		String connectionURL = "jdbc:mysql://localhost:3306/hms"+
+				"?useSSL=false&allowPublicKeyRetrieval=true";
+		
+		try {
+		Class.forName("com.mysql.cj.jdbc.Driver");
+		Connection con = DriverManager.getConnection(connectionURL,"root","root");
+		PreparedStatement ps = con.prepareStatement("insert into register_patients"
+				+"(name,age,gender,contact)"+ " values(?,?,?,?)");
+		ps.setString(1,patientName);
+		ps.setInt(2, age);
+		ps.setString(3,patientGender);
+		ps.setString(4,patientContact);
+		int i = ps.executeUpdate();
+//		RequestDispatcher rd = request.getRequestDispatcher("/index.jsp");
+//		rd.forward(request, response);
+		
+		if(i>0) {
+			System.out.println("Successful input");
+		}
+		//retrival
+		 List<Patient> patients = new ArrayList<>();
+		 ps = con.prepareStatement("Select name,age,gender,contact from register_patients order by id desc");
+		 ResultSet rs = ps.executeQuery();
+		
+		
+		while(rs.next()) {
+			
+			patients.add(new Patient(
+                    rs.getString("name"),
+                    rs.getInt("age"),
+                    rs.getString("gender"),
+                    rs.getString("contact")
+                ));
+			
+		}
+		HttpSession session = request.getSession();
+		session.setAttribute("patientsList", patients);
+		response.sendRedirect("loadPatients");
+		
+		
+		}catch(ClassNotFoundException cnfe) {
+			System.out.println(cnfe.getMessage());
+		}catch(SQLException se) {
+			System.out.println(se.getMessage());
+		}
+	}
+}
