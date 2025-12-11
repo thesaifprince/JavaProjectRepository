@@ -1,0 +1,52 @@
+package register_patients;
+
+import java.io.*;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.sql.*;
+@WebServlet("/processBilling")
+public class processBilling extends HttpServlet {
+
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+    throws ServletException, IOException {
+
+        String pname = req.getParameter("pname");
+        String dname = req.getParameter("dname");
+        String adate = req.getParameter("adate");
+        double cfee = Double.parseDouble(req.getParameter("cfee"));
+        double mcharge = Double.parseDouble(req.getParameter("mcharge"));
+        double rcharge = Double.parseDouble(req.getParameter("rcharge"));
+
+        double total = cfee + mcharge + rcharge;
+
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hms","root","root");
+
+            PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO billing(patient_name, doctor_name, appointment_date, consultation_fee, medicine_charges, room_charges, total_amount) VALUES (?,?,?,?,?,?,?)"
+            );
+
+            ps.setString(1, pname);
+            ps.setString(2, dname);
+            ps.setString(3, adate);
+            ps.setDouble(4, cfee);
+            ps.setDouble(5, mcharge);
+            ps.setDouble(6, rcharge);
+            ps.setDouble(7, total);
+
+            ps.executeUpdate();
+
+            res.sendRedirect("billing.jsp");
+
+        } catch(Exception e){
+            res.getWriter().println(e);
+        }
+    }
+}
+

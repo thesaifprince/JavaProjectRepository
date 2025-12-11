@@ -1,0 +1,59 @@
+package register_patients;
+
+import java.io.IOException;
+import java.sql.*;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+
+public class updateBill extends HttpServlet {
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        int billId = Integer.parseInt(request.getParameter("bill_id"));
+        String pname = request.getParameter("pname");
+        String dname = request.getParameter("dname");
+        String adate = request.getParameter("adate");
+
+        double cfee = Double.parseDouble(request.getParameter("cfee"));
+        double mcharge = Double.parseDouble(request.getParameter("mcharge"));
+        double rcharge = Double.parseDouble(request.getParameter("rcharge"));
+
+        double total = cfee + mcharge + rcharge;
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/hms", "root", ""
+            );
+
+            PreparedStatement ps = con.prepareStatement(
+                "UPDATE billing SET patient_name=?, doctor_name=?, appointment_date=?, " +
+                "consultation_fee=?, medicine_charges=?, room_charges=?, total_amount=? " +
+                "WHERE bill_id=?"
+            );
+
+            ps.setString(1, pname);
+            ps.setString(2, dname);
+            ps.setString(3, adate);
+            ps.setDouble(4, cfee);
+            ps.setDouble(5, mcharge);
+            ps.setDouble(6, rcharge);
+            ps.setDouble(7, total);
+            ps.setInt(8, billId);
+
+            ps.executeUpdate();
+
+            con.close();
+
+            response.sendRedirect("editBill.jsp");
+
+        } catch (Exception e) {
+            response.getWriter().println("Error updating bill: " + e);
+        }
+    }
+}

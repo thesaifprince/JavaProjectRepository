@@ -1,9 +1,3 @@
 INDEX VERSION 1.134
-D:\4. All project work\HMS\hmsBackend\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1888016423.index
-\HMS\src\main\java
-D:\JavaProject\hmsBackend\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1888016423.index
-\HMS\src\main\java
-C:\Users\thesa\OneDrive\Desktop\hmsBackend\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1888016423.index
-\HMS\src\main\java
-C:\Users\Lenovo\Desktop\hmsBackend\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1888016423.index
+C:\Users\Lenovo\Desktop\JavaProjectRepository\JavaProject\hmsBackend\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1888016423.index
 \HMS\src\main\java
