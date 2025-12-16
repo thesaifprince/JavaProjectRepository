@@ -26,7 +26,7 @@
         <li class="nav-item"><a class="nav-link" href="loadAppointments">Patients-List</a></li>
         <li class="nav-item"><a class="nav-link" href="billing.jsp">Billing Page</a></li>
         <li class="nav-item">
-          <a class="nav-link" href="viewBills.jsp">View Bills</a>
+          <a class="nav-link" href="view_bills.jsp">View Bills</a>
         </li>
       </ul>
     </div>

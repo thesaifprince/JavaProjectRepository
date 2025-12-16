@@ -35,7 +35,7 @@
         </li>
         
         <li class="nav-item">
-          <a class="nav-link" href="viewBills.jsp">View Bills</a>
+          <a class="nav-link" href="view_bills.jsp">View Bills</a>
         </li>
         
         
