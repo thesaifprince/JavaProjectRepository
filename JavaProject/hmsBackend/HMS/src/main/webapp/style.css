@@ -167,6 +167,44 @@ button.delete-btn {
   color: white;
 }
 
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.section {
+    display: none;
+    flex: 1;
+}
+
+.section.active {
+    display: block;
+}
+
+.footer1{
+	z-index:4;
+	height:120px;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background-color:silver;
+    color:#000;
+    font-size:25px;
+    font-weight:bold;
+}
+
+
+
+
+
+
+
 
 
 

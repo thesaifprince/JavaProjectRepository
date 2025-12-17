@@ -38,8 +38,20 @@
 
     <!-- Dashboard Section -->
    <section id="dashboard" class="section active">
-    <h2>Dashboard</h2>
-    <p>Welcome to the Hospital Management System! Use the navigation menu to manage patients, appointments, and tokens.</p>
+    <h2>About us</h2>
+    
+    <p>
+    Welcome to the Hospital Management System, a comprehensive platform designed to simplify and streamline hospital operations. 
+    Our system efficiently manages patient records, appointments, billing, and token systems, ensuring smooth coordination between 
+    doctors, staff, and patients for better healthcare services.
+</p>
+    
+    <p style="color:purple; font-size: 18px;">Welcome to the Hospital Management System! Use the navigation 
+    menu to manage <span style="background-color: white; color: black; font-weight: bold;"> patients, 
+    appointments, tokens and billing.</p>
+    
+    
+    
 
     <!-- Slideshow -->
     <div class="slideshow-container">
@@ -47,6 +59,10 @@
         <img class="slide" src="image1.jpg" alt="Hospital Image 2">
         <img class="slide" src="image2.jpg" alt="Hospital Image 3">
     </div>
+    
+     <div class="footer1">
+    © 2025 Hospital Management System | All Rights Reserved
+	</div>
 </section>
 
 
@@ -96,6 +112,7 @@
             <!-- <button type="submit">Book</button> -->
             <input type="submit" value="Book Appointment">
         </form>
+        </section>
 
         
 
@@ -108,5 +125,10 @@
     </section>
 
     <script src="script.js"></script>
+   
+
+
 </body>
+
+
 </html>
