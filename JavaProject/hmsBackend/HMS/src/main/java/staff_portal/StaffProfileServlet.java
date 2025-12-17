@@ -1,0 +1,76 @@
+package staff_portal;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+
+@WebServlet("/StaffProfileServlet")
+@MultipartConfig(maxFileSize = 5 * 1024 * 1024) // 5MB
+public class StaffProfileServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    private static final String DB_URL  = "jdbc:mysql://localhost:3306/hms";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "root";
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("staffId") == null) {
+            response.sendRedirect("staffPortal.jsp");
+            return;
+        }
+
+        String staffId = session.getAttribute("staffId").toString();
+        String stream  = request.getParameter("stream");
+        String role    = request.getParameter("role");
+
+//        Part photoPart = request.getPart("photo");
+//        InputStream photoInputStream = photoPart.getInputStream();
+        String photoBase64 = request.getParameter("photoBase64");
+        photoBase64 = photoBase64.split(",")[1];
+        byte[] imageBytes = java.util.Base64.getDecoder().decode(photoBase64);
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+
+            String sql = "INSERT INTO staff_profiles (staff_id, stream, role, photo) VALUES (?, ?, ?, ?)";
+            PreparedStatement ps = con.prepareStatement(sql);
+
+            ps.setString(1, staffId);
+            ps.setString(2, stream);
+            ps.setString(3, role);
+            ps.setBytes(4, imageBytes);
+
+            ps.executeUpdate();
+
+            ps.close();
+            con.close();
+
+            response.sendRedirect("staffDashboard.jsp");
+
+        } catch (Exception e) {
+            response.setContentType("text/html");
+            response.getWriter().println("<script>");
+            response.getWriter().println("alert('Profile already submitted or error occurred');");
+            response.getWriter().println("location='staffDashboard.jsp';");
+            response.getWriter().println("</script>");
+        }
+    }
+}

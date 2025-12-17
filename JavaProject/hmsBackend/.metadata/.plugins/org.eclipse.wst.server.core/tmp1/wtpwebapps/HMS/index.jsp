@@ -1,4 +1,4 @@
-<%@page import="java.util.*, register_patients.Patient" %>
+<%@ page import="java.util.*, register_patients.Patient" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,6 +13,7 @@
         <h1>Hospital Management System</h1>
         <nav>
             <ul>
+               	 <li><a href="staffPortal.jsp">Staff-Portal</a></li>
                 <li><a href="#" onclick="showSection('dashboard')">Dashboard</a></li>
                 <li><a href="#" onclick="showSection('patients')">Patients</a></li>
                 <li><a href="loadPatients">Patients List</a></li>
@@ -61,7 +62,8 @@
     </div>
     
      <div class="footer1">
-    © 2025 Hospital Management System | All Rights Reserved
+    © 2025 Hospital Management System | All Rights Reserved<br/>
+    Made By Saif Ali (project under Research and Development)
 	</div>
 </section>
 

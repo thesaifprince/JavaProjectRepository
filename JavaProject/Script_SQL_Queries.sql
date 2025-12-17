@@ -47,4 +47,26 @@ CREATE TABLE pdf_log (
     remarks TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-select * from pdf_log
+select * from pdf_log;
+
+
+CREATE TABLE staff_portal_login_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    staff_id VARCHAR(50),
+    name VARCHAR(100),
+    email VARCHAR(100),
+    password VARCHAR(100)
+);
+select * from staff_portal_login_details;
+truncate staff_portal_login_details;
+CREATE TABLE staff_profiles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    staff_id VARCHAR(50) UNIQUE,
+    stream VARCHAR(50),
+    role VARCHAR(50),
+    photo LONGBLOB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+select * from staff_profiles;
+truncate staff_profiles;
