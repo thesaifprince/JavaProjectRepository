@@ -1,0 +1,205 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+<%@ page import="jakarta.servlet.http.HttpSession" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body{
+            min-height:100vh;
+            background: linear-gradient(135deg,#141e30,#243b55);
+            color:#fff;
+        }
+        .glass-card{
+            backdrop-filter: blur(14px);
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            border:1px solid rgba(255,255,255,0.3);
+            box-shadow:0 10px 35px rgba(0,0,0,0.4);
+        }
+        .circle-img{
+            width:180px;
+            height:180px;
+            border-radius:50%;
+            object-fit:cover;
+            border:4px solid rgba(255,255,255,0.6);
+        }
+        .form-control, .form-select{
+            background: rgba(255,255,255,0.25);
+            border:none;
+            color:#fff;
+        }
+        .form-select option{ color:#000; }
+    </style>
+</head>
+<body>
+
+<%
+    /* ---------------- SESSION CHECK ---------------- */
+    HttpSession sess = request.getSession(false);
+    if(sess == null || sess.getAttribute("staffId") == null){
+        response.sendRedirect("staffPortal.jsp");
+        return;
+    }
+
+    String staffId   = sess.getAttribute("staffId").toString();
+    String staffName = sess.getAttribute("staffName").toString();
+
+    /* ---------------- DB CHECK ---------------- */
+    boolean profileExists = false;
+    String stream = "";
+    String role   = "";
+
+    try{
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/hms","root","root");
+
+        String sql = "SELECT stream, role FROM staff_profiles WHERE staff_id=?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, staffId);
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next()){
+            profileExists = true;
+            stream = rs.getString("stream");
+            role   = rs.getString("role");
+        }
+        rs.close(); ps.close(); con.close();
+    }catch(Exception e){ }
+%>
+
+<div class="container py-5">
+
+    <!-- ================= ONE TIME FORM ================= -->
+    <% if(!profileExists){ %>
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="glass-card p-4">
+                <h3 class="text-center">One Time Fill up Form</h3>
+                <p class="text-center text-warning">In case wrong data, contact admin</p>
+
+                <form action="StaffProfileServlet" method="post" enctype="multipart/form-data">
+
+                    <label class="mt-2">Stream / Expertise</label>
+                    <select class="form-select mb-3" name="stream" required onchange="updateOptions(this.value)">
+                        <option value="">-- Select Stream --</option>
+                        <option value="Medical">Medical</option>
+                        <option value="Hospital Management">Hospital Management</option>
+                    </select>
+
+                    <label>Role</label>
+                    <select class="form-select mb-3" name="role" id="roleSelect" required>
+                        <option value="">-- Select Role --</option>
+                    </select>
+
+                    <label>Capture / Upload Photo</label>
+                    <div class="mb-3">
+    <video id="video" width="300" height="230" autoplay class="rounded border"></video>
+</div>
+
+<div class="mb-3">
+    <button type="button" class="btn btn-primary" onclick="capturePhoto()">
+        Capture Photo
+    </button>
+</div>
+
+<canvas id="canvas" width="300" height="230" style="display:none;"></canvas>
+
+<input type="hidden" name="photoBase64" id="photoBase64" required>
+                    <button class="btn btn-success w-100">Submit Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- ================= DASHBOARD ================= -->
+    <% if(profileExists){ %>
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="glass-card p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-4 text-center">
+                        <img src="LoadStaffImageServlet?staffId=<%=staffId%>" class="circle-img" alt="Profile">
+                    </div>
+                    <div class="col-md-8">
+                        <h4>Welcome, <%=staffName%></h4>
+                        <p><b>Staff ID:</b> <%=staffId%></p>
+                        <p><b>Stream:</b> <%=stream%></p>
+                        <p><b>Role:</b> <%=role%></p>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h5>Current Patients Allotted / Booked</h5>
+                <table class="table table-dark table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Name</th>
+                            <th>Ward</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Future Implementation -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+</div>
+
+<script>
+function updateOptions(stream){
+    let role = document.getElementById("roleSelect");
+    role.innerHTML = '<option value="">-- Select Role --</option>';
+
+    if(stream === "Medical"){
+        addOptions(role,["Surgeon","Paramedic","Lab Technician","Nurse","Ward Boy","Dresser","Compounder"]);
+    }
+    if(stream === "Hospital Management"){
+        addOptions(role,["MD","Supervisor","Apparatus-Technician","Medical Store Incharge"]);
+    }
+}
+function addOptions(select, arr){
+    arr.forEach(v=>{
+        let o=document.createElement("option");
+        o.value=v; o.text=v; select.appendChild(o);
+    });
+}
+
+
+let video = document.getElementById("video");
+let canvas = document.getElementById("canvas");
+let photoBase64 = document.getElementById("photoBase64");
+
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => {
+    video.srcObject = stream;
+})
+.catch(err => {
+    alert("Camera access denied");
+});
+
+function capturePhoto() {
+    let context = canvas.getContext("2d");
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    photoBase64.value = canvas.toDataURL("image/png");
+    alert("Photo Captured Successfully");
+}
+</script>
+
+</body>
+</html>

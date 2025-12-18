@@ -1,0 +1,75 @@
+package staff_portal;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+@WebServlet("/StaffLoginServlet")
+public class StaffLoginServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    private static final String DB_URL  = "jdbc:mysql://localhost:3306/hms";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "root";
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        String staffId  = request.getParameter("staffId");
+        String password = request.getParameter("password");
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+
+            String sql = "SELECT * FROM staff_portal_login_details WHERE staff_id=? AND password=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+
+            ps.setString(1, staffId);
+            ps.setString(2, password);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                // ✅ Correct credentials → create session
+                HttpSession session = request.getSession();
+                session.setAttribute("staffId", staffId);
+                session.setAttribute("staffName", rs.getString("name"));
+
+                response.sendRedirect("staffDashboard.jsp");
+
+            } else {
+                // ❌ Wrong credentials
+                out.println("<script type='text/javascript'>");
+                out.println("alert('False Credentials! Contact Admin. Incident Reported');");
+                out.println("location='staffPortal.jsp';");
+                out.println("</script>");
+            }
+
+            rs.close();
+            ps.close();
+            con.close();
+
+        } catch (Exception e) {
+            out.println("<script type='text/javascript'>");
+            out.println("alert('Server Error: " + e.getMessage() + "');");
+            out.println("location='staffPortal.jsp';");
+            out.println("</script>");
+        }
+    }
+}

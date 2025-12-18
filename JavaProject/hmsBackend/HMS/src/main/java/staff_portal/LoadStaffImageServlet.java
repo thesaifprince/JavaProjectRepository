@@ -1,0 +1,66 @@
+package staff_portal;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/LoadStaffImageServlet")
+public class LoadStaffImageServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    private static final String DB_URL  = "jdbc:mysql://localhost:3306/hms";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "root";
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String staffId = request.getParameter("staffId");
+
+        if (staffId == null || staffId.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+
+            String sql = "SELECT photo FROM staff_profiles WHERE staff_id=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, staffId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                byte[] imageBytes = rs.getBytes("photo");
+
+                response.setContentType("image/png");
+                response.setContentLength(imageBytes.length);
+
+                OutputStream os = response.getOutputStream();
+                os.write(imageBytes);
+                os.flush();
+                os.close();
+            }
+
+            rs.close();
+            ps.close();
+            con.close();
+
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+}

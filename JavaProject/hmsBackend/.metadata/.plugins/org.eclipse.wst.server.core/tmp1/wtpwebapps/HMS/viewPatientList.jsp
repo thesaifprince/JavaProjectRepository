@@ -1,4 +1,4 @@
-<%@ page import="java.util.*,register_patients.Patient" %>
+<%@page import="java.util.*,register_patients.Patient" %>
 <!DOCTYPE html>
 <html>
 <head>
